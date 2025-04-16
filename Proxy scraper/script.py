@@ -191,8 +191,10 @@ async def check_proxy_access(session: aiohttp.ClientSession, semaphore: asyncio.
 async def main():
     print("~~~~~destrix's proxy scraper~~~~~")
     
-    target_url = input("Enter target URL (for example google.com): ").strip()
-    if not target_url.startswith(('http://', 'https://')):
+    target_url = input("Enter target URL (for example google.com) or leave blank for all proxies: ").strip()
+    if target_url is None or target_url == "":
+        target_url = ""
+    elif not target_url.startswith(('http://', 'https://')):
         target_url = 'https://' + target_url
     
     connector = aiohttp.TCPConnector(limit=None, ssl=False)
@@ -223,9 +225,35 @@ async def main():
             
         print(f"Got {len(all_proxies)} unique proxies in {fetch_time:.2f} seconds")
         
+        if target_url is None or target_url == "":
+            working_proxies = list(all_proxies)
+            working_proxies.sort(key=lambda x: x[2])
+            
+            #json format
+            with open("working_proxies.json", "w") as f:
+                json.dump(
+                    [{
+                        "ip": ip, 
+                        "port": port, 
+                        "type": ptype, 
+                        "url": f"{ptype}://{ip}:{port}"
+                    } for ip, port, ptype in working_proxies],
+                    f,
+                    indent=4
+                )
+            
+            #also save as txt
+            with open("working_proxies.txt", "w") as f:
+                for ip, port, ptype in working_proxies:
+                    f.write(f"{ptype}://{ip}:{port}\n")
+            total_time = time.time() - start_time
+            print(f"Saved results to working_proxies.json and working_proxies.txt")
+            print(f"Total time: {total_time:.2f} seconds")
+            return
+
         print(f"Checking which proxies can reach: {target_url}")
         
-        check_semaphore = asyncio.Semaphore(1000) #1000 max at one time
+        check_semaphore = asyncio.Semaphore(1000) #1000 max at one time (its enough imo)
         
         working_proxies = []
         counter = [0, len(all_proxies)]
