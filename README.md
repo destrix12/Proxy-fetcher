@@ -7,7 +7,7 @@ The script will output its progress in terminal and the proxies will be saved in
 ## Install needed things
 Make sure you have **Python 3.7+** installed. Then, install the required dependencies:
 ```
-pip install -r aiohttp beautifulsoup4
+pip install aiohttp beautifulsoup4
 ```
 ## Run the script
 ```
