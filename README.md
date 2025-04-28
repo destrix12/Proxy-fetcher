@@ -13,3 +13,4 @@ pip install aiohttp beautifulsoup4
 ```
 python script.py
 ```
+IT CAN GENERATE ALMOST 200000 PROXIES!!!!!11111111111111111
